@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -36,5 +37,21 @@ func main() {
 		log.Fatal("Error reading body. ", err)
 	}
 
-	fmt.Printf("%s\n", string(body))
+	// fmt.Printf("%s\n", string(body))
+	parseContent(body)
+}
+
+// 4-消除噪音正则表达式获取信息
+func parseContent(content []byte) {
+	// ()   分组用
+	// +    至少一个或多个
+	// [^"] 不包含"这个字符
+	//<a href="/tag/科普" class="tag">科普</a>
+	re := regexp.MustCompile(`<a href="([^"]+)" class="tag">([^<]+)</a>`)
+
+	matches := re.FindAllSubmatch(content, -1)
+
+	for _, m := range matches {
+		fmt.Printf("url:%s\n", "https://book.douban.com"+string(m[1]))
+	}
 }
