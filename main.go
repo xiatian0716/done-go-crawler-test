@@ -12,9 +12,14 @@ func main() {
 	// 	ParseFunc: parse.ParseTag,
 	// })
 
-	// parse.ParseBookList
+	// // parse.ParseBookList
+	// engine.Run(engine.Request{
+	// 	Url:       "https://book.douban.com/tag/神经网络",
+	// 	ParseFunc: parse.ParseBookList,
+	// })
+
 	engine.Run(engine.Request{
-		Url:       "https://book.douban.com/tag/神经网络",
-		ParseFunc: parse.ParseBookList,
+		Url:       "https://book.douban.com/subject/30293801/",
+		ParseFunc: parse.ParseBookDetail,
 	})
 }
