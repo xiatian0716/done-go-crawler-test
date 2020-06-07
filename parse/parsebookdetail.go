@@ -17,9 +17,10 @@ var priceRe = regexp.MustCompile(`<span class="pl">定价:</span>([^<]+)<br/>`)
 var scoreRe = regexp.MustCompile(`<strong class="ll rating_num " property="v:average">([^<]+)</strong>`)
 var intoRe = regexp.MustCompile(`<div class="intro">[\d\D]*?<p>([^<]+)</p></div>`)
 
-func ParseBookDetail(contents []byte) engine.ParseResult {
+func ParseBookDetail(contents []byte, bookname string) engine.ParseResult {
 	//fmt.Printf("%s",contents)
 	bookdetail := model.Bookdetail{}
+	bookdetail.BookName = bookname
 	bookdetail.Author = ExtraString(contents, autoRe)
 	page, err := strconv.Atoi(ExtraString(contents, pageRe))
 	if err == nil {

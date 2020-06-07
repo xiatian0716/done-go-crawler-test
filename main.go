@@ -18,8 +18,15 @@ func main() {
 	// 	ParseFunc: parse.ParseBookList,
 	// })
 
+	// // parse.ParseBookDetail
+	// engine.Run(engine.Request{
+	// 	Url:       "https://book.douban.com/subject/30293801/",
+	// 	ParseFunc: parse.ParseBookDetail,
+	// })
+
+	// 完成单任务爬虫
 	engine.Run(engine.Request{
-		Url:       "https://book.douban.com/subject/30293801/",
-		ParseFunc: parse.ParseBookDetail,
+		Url:       "https://book.douban.com",
+		ParseFunc: parse.ParseTag,
 	})
 }
