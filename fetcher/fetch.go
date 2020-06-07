@@ -8,7 +8,10 @@ import (
 	"time"
 )
 
+// 请求频率控制(100毫秒-1秒10个请求)
+var rateLimiter = time.Tick(100 * time.Millisecond) // 100毫秒
 func Fetch(url string) ([]byte, error) {
+	<-rateLimiter
 	// 设置请求
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
