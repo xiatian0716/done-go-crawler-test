@@ -44,11 +44,24 @@ func main() {
 	// 	ParseFunc: parse.ParseTag,
 	// })
 
-	// Scheduler实现III-Request队列和Worker队列
+	// // Scheduler实现III-Request队列和Worker队列
+	// // e:= 因为是个指针接受者我们要定义一个变量
+	// e := engine.ConcurrentEngine{
+	// 	// & 取地址，因为SimpleScheduler是个*接受者
+	// 	Scheduler:   &scheduler.QueuedScheduler{},
+	// 	WorkerCount: 10,
+	// }
+	// e.Run(engine.Request{
+	// 	Url:       "https://book.douban.com",
+	// 	ParseFunc: parse.ParseTag,
+	// })
+
+	// Scheduler重构
 	// e:= 因为是个指针接受者我们要定义一个变量
 	e := engine.ConcurrentEngine{
 		// & 取地址，因为SimpleScheduler是个*接受者
-		Scheduler:   &scheduler.QueuedScheduler{},
+		Scheduler: &scheduler.SimpleScheduler{},
+		// Scheduler:   &scheduler.QueuedScheduler{},
 		WorkerCount: 10,
 	}
 	e.Run(engine.Request{

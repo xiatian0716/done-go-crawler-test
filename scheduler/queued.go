@@ -7,6 +7,12 @@ type QueuedScheduler struct {
 	workerChan  chan chan engine.Request
 }
 
+// 给worker返回一个chan
+func (s *QueuedScheduler) WorkerChan() chan engine.Request {
+	// 我们希望每个workerChan有一个自己的chan
+	return make(chan engine.Request)
+}
+
 // requestChan：有人Submit一个request我们就加进去
 func (s *QueuedScheduler) Submit(request engine.Request) {
 	s.requestChan <- request
@@ -15,10 +21,6 @@ func (s *QueuedScheduler) Submit(request engine.Request) {
 // workerChan：从外界告诉我们有一个worker它可以负责去接收它可以负责去接收request
 func (s *QueuedScheduler) WorkerReady(workerChan chan engine.Request) {
 	s.workerChan <- workerChan
-}
-
-func (s *QueuedScheduler) ConfigureMasterWorkerChan(requests chan engine.Request) {
-	panic("implement me")
 }
 
 // 启动一个总控的goroutine

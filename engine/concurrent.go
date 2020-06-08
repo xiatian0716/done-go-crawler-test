@@ -9,12 +9,20 @@ type ConcurrentEngine struct {
 
 type Scheduler interface {
 	Submit(Request)
-	// 把in放到Scheduler里面
-	ConfigureMasterWorkerChan(chan Request)
-	// workerChan：从外界告诉我们有一个worker它可以负责去接收它可以负责去接收request
-	WorkerReady(chan Request)
+	// 我们要问Scheduler我有一个worker请问给我哪一个chan
+	WorkerChan() chan Request
+	// WorkerReady(chan Request)
+	ReadyNotifier
 	// 启动一个总控的goroutine
 	Run()
+}
+
+// Scheduler里面总共有4个方法，这么大的一个东西送过来有
+// 点吃力，我觉得有点重，因此我们把WorkerReady()拿出去
+type ReadyNotifier interface {
+	// workerChan：从外界告诉我们有一个worker
+	// 它可以负责去接收它可以负责去接收request
+	WorkerReady(chan Request)
 }
 
 func (e *ConcurrentEngine) Run(seeds ...Request) {
@@ -24,7 +32,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 
 	// 创建worker执行任务
 	for i := 0; i < e.WorkerCount; i++ {
-		createWorker(e.Scheduler, out)
+		createWorker(e.Scheduler, e.Scheduler.WorkerChan(), out)
 	}
 
 	// 把seeds扔给Scheduler
@@ -51,15 +59,13 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 }
 
 // 创建worker
-func createWorker(s Scheduler, out chan ParseResult) {
-	// 现在每个worker都有一个产
-	// 所以现在chan就是自己的
-	in := make(chan Request)
+// Scheduler里面总共有4个方法，这么大的一个东西送过来有点吃力，我觉得有点重，因此我们把WorkerReady()拿出去
+func createWorker(ready ReadyNotifier, in chan Request, out chan ParseResult) {
 	go func() {
 		for {
 			// 告诉scheduler我准备好了
 			// 把chan作为参数穿进去告诉
-			s.WorkerReady(in)
+			ready.WorkerReady(in)
 			// 然后呢我们收到事情就做
 			request := <-in
 			// fetcher网页body(Url+ParseFunc)

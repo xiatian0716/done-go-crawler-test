@@ -6,10 +6,19 @@ type SimpleScheduler struct {
 	workerChan chan engine.Request
 }
 
-// 把in放到Scheduler里面
-// * ConfigureMasterWorkerChan会改变workerChan的值
-func (s *SimpleScheduler) ConfigureMasterWorkerChan(in chan engine.Request) {
-	s.workerChan = in
+// 他问我要WorkerChan我就return这个workerChan
+// 所以这样所有的worker就共用这一个workerChan了
+func (s *SimpleScheduler) WorkerChan() chan engine.Request {
+	return s.workerChan
+}
+
+// WorkerReady不做事情，但是我们也实现一下，这样就实现了这个接口
+func (s *SimpleScheduler) WorkerReady(requests chan engine.Request) {
+}
+
+// 在Run里面我们就把workerChan做出来
+func (s *SimpleScheduler) Run() {
+	s.workerChan = make(chan engine.Request)
 }
 
 //把request发送给worker chan
