@@ -1,10 +1,10 @@
 package engine
 
-import "log"
-
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
+	//任何东西都可以用
+	ItemChan chan interface{}
 }
 
 type Scheduler interface {
@@ -45,10 +45,23 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	for {
 		result := <-out
 
+		// 存储的入口可以叫save
+		// 但是我们在这个save里面真的去做事情吗？
+		// 真的花时间去save这个item可不可以，这个当然是不可以
+		// 我们在这里收到result后，我们作为engine来说它要尽快脱手
+		// 它手里不要做很多事情，做事情是worker做的，我们拿到result-item后要尽快脱手
+		// save(item)
+		// go save(item)
+		// go func() { itemChan <- item }()
+		// 我们为每个item开一个gorutine之后呢，它们很快就会被消耗掉
+		// 消耗的速度比生成的速度快(不需要网络连接-内存)，所以开出来的goruting也不会太多
+		// go func() { itemChan <- item }()
+
 		// 打印Items结果
 		for _, item := range result.Items {
-			log.Printf("Got item#%d: %s\n", itemCount, item)
+			// log.Printf("Got item#%d: %s\n", itemCount, item)
 			itemCount++
+			go func() { e.ItemChan <- item }()
 		}
 
 		// 把新的Requesrts送给Scheduler加进去
