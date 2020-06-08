@@ -31,14 +31,26 @@ func main() {
 	// 	ParseFunc: parse.ParseTag,
 	// })
 
-	// 完成单任务爬虫
+	// // Scheduler实现I-所有Worker公用一个输入
+	// // Scheduler实现II-并发分发Request
+	// // e:= 因为是个指针接受者我们要定义一个变量
+	// e := engine.ConcurrentEngine{
+	// 	// & 取地址，因为SimpleScheduler是个*接受者
+	// 	Scheduler:   &scheduler.SimpleScheduler{},
+	// 	WorkerCount: 10,
+	// }
+	// e.Run(engine.Request{
+	// 	Url:       "https://book.douban.com",
+	// 	ParseFunc: parse.ParseTag,
+	// })
+
+	// Scheduler实现III-Request队列和Worker队列
 	// e:= 因为是个指针接受者我们要定义一个变量
-	e:=engine.ConcurrentEngine{
+	e := engine.ConcurrentEngine{
 		// & 取地址，因为SimpleScheduler是个*接受者
-		Scheduler:&scheduler.SimpleScheduler{},
+		Scheduler:   &scheduler.QueuedScheduler{},
 		WorkerCount: 10,
 	}
-
 	e.Run(engine.Request{
 		Url:       "https://book.douban.com",
 		ParseFunc: parse.ParseTag,
