@@ -70,11 +70,26 @@ func main() {
 	// 	ParseFunc: parse.ParseTag,
 	// })
 
-	// ItemSaver的架构
+	// // ItemSaver的架构
+	// e := engine.ConcurrentEngine{
+	// 	Scheduler:   &scheduler.QueuedScheduler{},
+	// 	WorkerCount: 10,
+	// 	ItemChan:    persist.ItemSaver(),
+	// }
+	// e.Run(engine.Request{
+	// 	Url:       "https://book.douban.com",
+	// 	ParseFunc: parse.ParseTag,
+	// })
+
+	// ItemSaver的重构
+	itemChan, err := persist.ItemSaver("database")
+	if err != nil {
+		panic(err)
+	}
 	e := engine.ConcurrentEngine{
 		Scheduler:   &scheduler.QueuedScheduler{},
 		WorkerCount: 10,
-		ItemChan:    persist.ItemSaver(),
+		ItemChan:    itemChan,
 	}
 	e.Run(engine.Request{
 		Url:       "https://book.douban.com",

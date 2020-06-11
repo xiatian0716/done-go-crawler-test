@@ -26,14 +26,6 @@ func TestSaver(t *testing.T) {
 		},
 	}
 
-	// 测试save方法
-	// Save expected item
-	err := save(expected)
-
-	if err != nil {
-		panic(err)
-	}
-
 	// 然后我们去拿出来
 	// Fetch saved item
 	// TODO: Try to start up elastic search
@@ -46,8 +38,16 @@ func TestSaver(t *testing.T) {
 		panic(err)
 	}
 
+	// 测试save方法
+	// Save expected item
+	const index = "database"
+	err = save(client, index, expected)
+	if err != nil {
+		panic(err)
+	}
+
 	resp, err := client.Get().
-		Index("database").
+		Index(index).
 		Type(expected.Type).
 		Id(expected.Id).
 		Do(context.Background())
