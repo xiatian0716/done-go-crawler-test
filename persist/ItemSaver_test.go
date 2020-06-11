@@ -2,6 +2,7 @@ package persist
 
 import (
 	"context"
+	"go-crawler-test/engine"
 	"go-crawler-test/model"
 	"testing"
 
@@ -9,23 +10,32 @@ import (
 )
 
 func TestSaver(t *testing.T) {
-	bookdetail := model.Bookdetail{
-		BookName:  "BookName",
-		Author:    "刘慈欣",
-		Publicer:  "重庆出版社",
-		Bookpages: 470,
-		Price:     "32.00",
-		Score:     "9.3",
-		Into:      "三体人在利用魔法般的科技锁死了地球人的科学之后...",
+	expected := engine.Item{
+		Url:  "https://book.douban.com",
+		Type: "douban_test",
+		Id:   "001",
+
+		Payload: model.Bookdetail{
+			BookName:  "BookName",
+			Author:    "刘慈欣",
+			Publicer:  "重庆出版社",
+			Bookpages: 470,
+			Price:     "32.00",
+			Score:     "9.3",
+			Into:      "三体人在利用魔法般的科技锁死了地球人的科学之后...",
+		},
 	}
 
 	// 测试save方法
-	id, err := save(bookdetail)
+	// Save expected item
+	err := save(expected)
 
 	if err != nil {
 		panic(err)
 	}
 
+	// 然后我们去拿出来
+	// Fetch saved item
 	// TODO: Try to start up elastic search
 	// here using docker go client.
 	client, err := elastic.NewClient(
@@ -38,8 +48,8 @@ func TestSaver(t *testing.T) {
 
 	resp, err := client.Get().
 		Index("database").
-		Type("table").
-		Id(id).
+		Type(expected.Type).
+		Id(expected.Id).
 		Do(context.Background())
 	if err != nil {
 		panic(err)

@@ -4,7 +4,7 @@ type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
 	//任何东西都可以用
-	ItemChan chan interface{}
+	ItemChan chan Item
 }
 
 type Scheduler interface {

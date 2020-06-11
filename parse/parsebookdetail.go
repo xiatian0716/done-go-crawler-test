@@ -19,6 +19,7 @@ var intoRe = regexp.MustCompile(`<div class="intro">[\d\D]*?<p>([^<]+)</p></div>
 
 func ParseBookDetail(contents []byte, bookname string) engine.ParseResult {
 	//fmt.Printf("%s",contents)
+	var id string
 	bookdetail := model.Bookdetail{}
 	bookdetail.BookName = bookname
 	bookdetail.Author = ExtraString(contents, autoRe)
@@ -30,8 +31,19 @@ func ParseBookDetail(contents []byte, bookname string) engine.ParseResult {
 	bookdetail.Into = ExtraString(contents, intoRe)
 	bookdetail.Score = ExtraString(contents, scoreRe)
 	bookdetail.Price = ExtraString(contents, priceRe)
+
+	id = string(bookname + bookdetail.Publicer)
+	// 配合ItemSaver的修改对Item调整
 	result := engine.ParseResult{
-		Items: []interface{}{bookdetail},
+		Items: []engine.Item{
+			{
+				Url:  "https://book.douban.com",
+				Type: "douban_table_test",
+				Id:   id,
+
+				Payload: bookdetail,
+			},
+		},
 	}
 
 	return result
